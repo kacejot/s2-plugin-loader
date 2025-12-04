@@ -43,26 +43,37 @@ target_sources(_pluginloader_base PUBLIC
 target_include_directories(_pluginloader_base INTERFACE "src" ${CONFIGURE_FILES_DIR})
 target_precompile_headers(_pluginloader_base INTERFACE "src/pch.h")
 
-function(pluginloader_add_impl name)
-    add_library(pluginloader_${name} SHARED ${ARGN})
+function(pluginloader_add name role)
+    # role:
+    #   LOADER_ROLE     -> Proxy DLL Loader
+    #   PLUGIN_ROLE     -> DLL with payload
+    #   STANDALONE_ROLE -> proxy + payload - loader
+
+    if (NOT role STREQUAL "PLUGIN_ROLE")
+		file(GLOB role_sources "src/proxy/${name}.*")
+    endif()
+
+    add_library(pluginloader_${name} SHARED ${role_sources})
+    target_link_libraries(pluginloader_${name} PUBLIC _pluginloader_base)
     set_target_properties(pluginloader_${name} PROPERTIES
         PREFIX ""
         OUTPUT_NAME ${name}
         SUFFIX ".dll"
     )
-    target_link_libraries(pluginloader_${name} PUBLIC _pluginloader_base)
+	
+	target_compile_definitions(pluginloader_${name} PUBLIC ${role})
 endfunction()
-
 
 # ==================================================================================================
 
-pluginloader_add_impl(no_proxy "src/proxy/none.cpp")
-pluginloader_add_impl(d3d11 "src/proxy/d3d11.cpp")
-pluginloader_add_impl(dsound "src/proxy/dsound.cpp" "src/proxy/dsound.def")
-pluginloader_add_impl(winmm "src/proxy/winmm.cpp")
-pluginloader_add_impl(xinput1_3 "src/proxy/xinput1_3.cpp" "src/proxy/xinput1_3.def")
+if (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    pluginloader_add(no_proxy LOADER_ROLE)
+    pluginloader_add(d3d11 LOADER_ROLE)
+    pluginloader_add(dsound LOADER_ROLE)
+    pluginloader_add(winmm LOADER_ROLE)
+    pluginloader_add(xinput1_3 LOADER_ROLE)
 
-install(
+    install(
     TARGETS
         pluginloader_no_proxy
         pluginloader_d3d11
@@ -71,3 +82,6 @@ install(
         pluginloader_xinput1_3
     RUNTIME DESTINATION .
 )
+else()
+    message(STATUS "[pluginloader] Loaded as submodule — no default targets")
+endif()
