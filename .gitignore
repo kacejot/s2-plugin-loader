@@ -6,7 +6,6 @@
 # C/C++ excludes
 .cache/clangd
 .gdbinit
-build
 out
 
 # CMake (from https://github.com/github/gitignore/blob/main/CMake.gitignore)

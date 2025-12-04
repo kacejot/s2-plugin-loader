@@ -3,10 +3,6 @@
 
 // Modified copy of  https://github.com/Erik-JS/proxy-dll-64/blob/master/winmm/main.cpp
 
-// this shit has to be put here to thwart GCC into thinking the real winmm lib has been already included
-// to avoid conflicts with the "fake" functions we're exporting here
-#define _INC_MMSYSTEM
-
 namespace pluginloader::proxy {
 
 namespace {
@@ -194,8 +190,10 @@ FARPROC winmm_wave_out_set_volume = nullptr;
 FARPROC winmm_wave_out_unprepare_header = nullptr;
 FARPROC winmm_wave_out_write = nullptr;
 
-} // namespace
+}  // namespace
 
+// NOLINTBEGIN(readability-identifier-naming, readability-avoid-return-with-void-value)
+// clang-format off
 DLL_EXPORT void CloseDriver() { return reinterpret_cast<decltype(&CloseDriver)>(winmm_close_driver)(); }
 DLL_EXPORT void DefDriverProc() { return reinterpret_cast<decltype(&DefDriverProc)>(winmm_def_driver_proc)(); }
 DLL_EXPORT void DriverCallback() { return reinterpret_cast<decltype(&DriverCallback)>(winmm_driver_callback)(); }
@@ -376,9 +374,10 @@ DLL_EXPORT void waveOutSetPlaybackRate() { return reinterpret_cast<decltype(&wav
 DLL_EXPORT void waveOutSetVolume() { return reinterpret_cast<decltype(&waveOutSetVolume)>(winmm_wave_out_set_volume)(); }
 DLL_EXPORT void waveOutUnprepareHeader() { return reinterpret_cast<decltype(&waveOutUnprepareHeader)>(winmm_wave_out_unprepare_header)(); }
 DLL_EXPORT void waveOutWrite() { return reinterpret_cast<decltype(&waveOutWrite)>(winmm_wave_out_write)(); }
+// clang-format on
+// NOLINTEND(readability-identifier-naming, readability-avoid-return-with-void-value)
 
 void init(HMODULE /*this_dll*/) {
-
     // Suspend all other threads to prevent a giant race condition
     const util::ThreadSuspender suspender{};
 
@@ -428,8 +427,10 @@ void init(HMODULE /*this_dll*/) {
     winmm_mci_free_command_resource = GetProcAddress(winmm_dll_handle, "mciFreeCommandResource");
     winmm_mci_get_creator_task = GetProcAddress(winmm_dll_handle, "mciGetCreatorTask");
     winmm_mci_get_device_id_a = GetProcAddress(winmm_dll_handle, "mciGetDeviceIDA");
-    winmm_mci_get_device_id_from_element_id_a = GetProcAddress(winmm_dll_handle, "mciGetDeviceIDFromElementIDA");
-    winmm_mci_get_device_id_from_element_id_w = GetProcAddress(winmm_dll_handle, "mciGetDeviceIDFromElementIDW");
+    winmm_mci_get_device_id_from_element_id_a =
+        GetProcAddress(winmm_dll_handle, "mciGetDeviceIDFromElementIDA");
+    winmm_mci_get_device_id_from_element_id_w =
+        GetProcAddress(winmm_dll_handle, "mciGetDeviceIDFromElementIDW");
     winmm_mci_get_device_id_w = GetProcAddress(winmm_dll_handle, "mciGetDeviceIDW");
     winmm_mci_get_driver_data = GetProcAddress(winmm_dll_handle, "mciGetDriverData");
     winmm_mci_get_error_string_a = GetProcAddress(winmm_dll_handle, "mciGetErrorStringA");
@@ -584,4 +585,4 @@ void free(void) {
     }
 }
 
-} // namespace pluginloader::proxy
+}  // namespace pluginloader::proxy

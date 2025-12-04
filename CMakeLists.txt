@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.24)
 
-project(pluginloader VERSION 1.0.5)
+project(pluginloader VERSION 1.0.6)
 
 add_library(_pluginloader_base INTERFACE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
@@ -67,6 +67,7 @@ install(
         pluginloader_no_proxy
         pluginloader_d3d11
         pluginloader_dsound
+        pluginloader_winmm
         pluginloader_xinput1_3
     RUNTIME DESTINATION .
 )
