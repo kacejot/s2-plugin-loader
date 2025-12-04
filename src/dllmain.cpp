@@ -1,8 +1,4 @@
-#include "pch.h"
-
-#include "console.h"
-#include "loader.h"
-#include "proxy/proxy.h"
+#include "dispatch.h"
 
 /**
  * @brief Main entry point.
@@ -16,15 +12,10 @@ BOOL APIENTRY DllMain(HMODULE h_module, DWORD ul_reason_for_call, LPVOID /*unuse
     switch (ul_reason_for_call) {
         case DLL_PROCESS_ATTACH:
             DisableThreadLibraryCalls(h_module);
-
-            pluginloader::console::create_if_needed();
-            pluginloader::proxy::init(h_module);
-            pluginloader::loader::load(h_module);
-
+            pluginloader::dispatch::on_process_attach<MODE>(h_module);
             break;
         case DLL_PROCESS_DETACH:
-            pluginloader::loader::free();
-            pluginloader::proxy::free();
+            pluginloader::dispatch::on_process_detach<MODE>();
             break;
         case DLL_THREAD_ATTACH:
         case DLL_THREAD_DETACH:
