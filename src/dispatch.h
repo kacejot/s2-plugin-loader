@@ -18,8 +18,10 @@ enum class loading_role {
     inline constexpr loading_role MODE = loading_role::PLUGIN;
 #elif defined(STANDALONE_ROLE)
     inline constexpr loading_role MODE = loading_role::STANDALONE;
-#else
+#elif defined(LOADER_ROLE)
     inline constexpr loading_role MODE = loading_role::LOADER;
+#else
+    #error "No loading role defined"
 #endif
 
 namespace pluginloader::dispatch {
@@ -47,7 +49,6 @@ inline void on_process_attach<loading_role::STANDALONE>(HMODULE h_module) {
     pluginloader::proxy::init(h_module);
     pluginloader::payload::init(h_module);
 }
-
 
 template<loading_role M>
 inline void on_process_detach() {
