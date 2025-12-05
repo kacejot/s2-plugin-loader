@@ -17,7 +17,7 @@ void init(HMODULE h_module);
  * @brief  Calls payload's deinitialization routine. Payload must export next symbol:
  *         extern "C" void free();
  */
-void free(void);
+void deinit(void);
 
 }
 
