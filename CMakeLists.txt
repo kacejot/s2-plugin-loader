@@ -43,6 +43,9 @@ target_sources(_pluginloader_base PUBLIC
 target_include_directories(_pluginloader_base INTERFACE "src" ${CONFIGURE_FILES_DIR})
 target_precompile_headers(_pluginloader_base INTERFACE "src/pch.h")
 
+set(PLUGINLOADER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(PLUGINLOADER_SOURCE_DIR ${PLUGINLOADER_SOURCE_DIR} PARENT_SCOPE)
+
 function(pluginloader_add name role)
     # role:
     #   LOADER_ROLE     -> Proxy DLL Loader
@@ -50,7 +53,8 @@ function(pluginloader_add name role)
     #   STANDALONE_ROLE -> proxy + payload - loader
 
     if (NOT role STREQUAL "PLUGIN_ROLE")
-		file(GLOB role_sources "src/proxy/${name}.*")
+        set(SEARCH_PATH "${PLUGINLOADER_SOURCE_DIR}/src/proxy/${name}.*")
+		file(GLOB role_sources "${SEARCH_PATH}")
     endif()
 
     add_library(pluginloader_${name} SHARED ${role_sources})
@@ -66,7 +70,7 @@ endfunction()
 
 # ==================================================================================================
 
-if (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+if (CMAKE_SOURCE_DIR STREQUAL PLUGINLOADER_SOURCE_DIR)
     pluginloader_add(no_proxy LOADER_ROLE)
     pluginloader_add(d3d11 LOADER_ROLE)
     pluginloader_add(dsound LOADER_ROLE)

@@ -15,9 +15,10 @@ void init(HMODULE h_module) {
 #endif
 }
 
-void deinit(void) {
+void free(void) {
 #if defined PLUGIN_ROLE || STANDALONE_ROLE
     ::deinit_plugin();
 #endif
 }
+
 }
